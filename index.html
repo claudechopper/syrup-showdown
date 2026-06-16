@@ -1101,15 +1101,19 @@
         if (f) {
           card.addEventListener("mouseenter", () => startFw(card, f));
           card.addEventListener("mouseleave", () => stopFw(card));
+          let touchY = 0;
           card.addEventListener("touchstart", (e) => {
-            e.preventDefault();
+            touchY = e.touches[0].clientY;
+          }, { passive: true });
+          card.addEventListener("touchend", (e) => {
+            if (Math.abs(e.changedTouches[0].clientY - touchY) > 10) return;
             if (activeFwCard === card) {
               stopFw(card);
             } else {
               startFw(card, f);
             }
             selectFlavour(card.dataset.name, true);
-          }, { passive: false });
+          });
         }
       });
     }
