@@ -1074,27 +1074,42 @@
         </article>
       `).join("");
 
+      let activeFwCard = null;
+      let fwTimer = null;
+
+      function startFw(card, f) {
+        if (activeFwCard && activeFwCard !== card) stopFw(activeFwCard);
+        activeFwCard = card;
+        card.classList.add("fw-active");
+        FW.startFor(f.color);
+        showChar(f.name);
+        clearTimeout(fwTimer);
+        fwTimer = setTimeout(() => stopFw(card), 3000);
+      }
+
+      function stopFw(card) {
+        clearTimeout(fwTimer);
+        if (card) card.classList.remove("fw-active");
+        FW.stop();
+        hideChar();
+        if (activeFwCard === card) activeFwCard = null;
+      }
+
       podium.querySelectorAll(".podium-card").forEach(card => {
         card.addEventListener("click", () => selectFlavour(card.dataset.name, true));
         const f = flavours.find(fl => fl.name === card.dataset.name);
         if (f) {
-          let fwTimer = null;
-          card.addEventListener("mouseenter", () => {
-            card.classList.add("fw-active");
-            FW.startFor(f.color);
-            showChar(f.name);
-            fwTimer = setTimeout(() => {
-              FW.stop();
-              hideChar();
-              card.classList.remove("fw-active");
-            }, 3000);
-          });
-          card.addEventListener("mouseleave", () => {
-            clearTimeout(fwTimer);
-            card.classList.remove("fw-active");
-            FW.stop();
-            hideChar();
-          });
+          card.addEventListener("mouseenter", () => startFw(card, f));
+          card.addEventListener("mouseleave", () => stopFw(card));
+          card.addEventListener("touchstart", (e) => {
+            e.preventDefault();
+            if (activeFwCard === card) {
+              stopFw(card);
+            } else {
+              startFw(card, f);
+            }
+            selectFlavour(card.dataset.name, true);
+          }, { passive: false });
         }
       });
     }
