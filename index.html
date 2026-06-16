@@ -1,0 +1,1412 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flavour Testing Party Graph</title>
+  <style>
+    :root {
+      --ink: #1d2630;
+      --muted: #63717d;
+      --paper: #fffdf7;
+      --panel: #ffffff;
+      --line: #e3ded5;
+      --sun: #ffcc3d;
+      --peach: #ff9368;
+      --berry: #7e3ff2;
+      --mint: #36b37e;
+      --cherry: #e23d5a;
+      --blue: #2876d7;
+      --chocolate: #6d3f28;
+      --cream: #fff2c8;
+      --good: #1d9a67;
+      --test: #d77a1f;
+      --cut: #d64545;
+      --shadow: 0 18px 40px rgba(31, 35, 41, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 12%, rgba(255, 204, 61, 0.28), transparent 25rem),
+        radial-gradient(circle at 90% 8%, rgba(226, 61, 90, 0.18), transparent 24rem),
+        linear-gradient(135deg, #fff7e4 0%, #f3fbff 42%, #fff3f7 100%);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.45;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(90deg, rgba(255, 147, 104, 0.22) 0 12px, transparent 12px),
+        linear-gradient(90deg, rgba(40, 118, 215, 0.16) 0 10px, transparent 10px),
+        linear-gradient(90deg, rgba(54, 179, 126, 0.16) 0 8px, transparent 8px);
+      background-size: 120px 6px, 170px 5px, 210px 4px;
+      background-position: 12px 32px, 50px 92px, 20px 160px;
+      opacity: 0.42;
+      transform: rotate(-8deg) scale(1.2);
+    }
+
+    main {
+      width: min(1200px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 26px 0 54px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero {
+      min-height: 520px;
+      border: 3px solid #1d2630;
+      border-radius: 22px;
+      overflow: hidden;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      display: grid;
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    }
+
+    .hero-copy {
+      padding: 34px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 28px;
+      background:
+        linear-gradient(135deg, rgba(255, 204, 61, 0.28), rgba(255, 255, 255, 0.75)),
+        var(--paper);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      width: fit-content;
+      align-items: center;
+      gap: 8px;
+      background: var(--ink);
+      color: white;
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 0.78rem;
+      font-weight: 850;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 18px;
+      font-size: 4.1rem;
+      line-height: 0.96;
+      letter-spacing: 0;
+    }
+
+    .hero-copy p {
+      max-width: 46rem;
+      color: #384653;
+      font-size: 1.08rem;
+      font-weight: 620;
+    }
+
+    .hero-art {
+      position: relative;
+      min-height: 520px;
+      display: grid;
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+      grid-template-rows: repeat(8, minmax(0, 1fr));
+      gap: 12px;
+      padding: 16px;
+      overflow: hidden;
+      background:
+        linear-gradient(135deg, rgba(255, 204, 61, 0.2), rgba(255, 255, 255, 0.58)),
+        #fff;
+    }
+
+    .hero-art img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border: 2px solid var(--ink);
+      border-radius: 18px;
+      box-shadow: 8px 10px 0 rgba(29, 38, 48, 0.12);
+      animation: collageFloat 6s ease-in-out infinite;
+    }
+
+    .hero-photo-main {
+      grid-area: 1 / 1 / 6 / 5;
+    }
+
+    .hero-photo-wide {
+      grid-area: 1 / 5 / 4 / 9;
+      animation-delay: 400ms;
+    }
+
+    .hero-photo-tall {
+      grid-area: 4 / 5 / 9 / 9;
+      animation-delay: 800ms;
+    }
+
+    .hero-photo-small {
+      grid-area: 6 / 1 / 9 / 3;
+      animation-delay: 1200ms;
+    }
+
+    .hero-photo-small-two {
+      grid-area: 6 / 3 / 9 / 5;
+      animation-delay: 1600ms;
+    }
+
+    .score-badge {
+      position: absolute;
+      left: 22px;
+      bottom: 22px;
+      width: min(280px, calc(100% - 44px));
+      background: rgba(255, 253, 247, 0.94);
+      border: 2px solid var(--ink);
+      border-radius: 18px;
+      padding: 15px;
+      box-shadow: 0 12px 24px rgba(31, 35, 41, 0.18);
+      backdrop-filter: blur(8px);
+    }
+
+    .score-badge strong {
+      display: block;
+      font-size: 2.25rem;
+      line-height: 1;
+      color: var(--good);
+    }
+
+    .score-badge span {
+      display: block;
+      color: var(--muted);
+      font-weight: 750;
+      margin-top: 5px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      border: 2px solid var(--ink);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fff;
+      box-shadow: 6px 6px 0 rgba(29, 38, 48, 0.12);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 0.88rem;
+      font-weight: 760;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin: 24px 0 18px;
+    }
+
+    button,
+    select {
+      min-height: 42px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--ink);
+      padding: 8px 14px;
+      font: inherit;
+      font-weight: 850;
+      box-shadow: 4px 4px 0 rgba(29, 38, 48, 0.12);
+      cursor: pointer;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    button:hover,
+    select:hover {
+      transform: translateY(-2px);
+      box-shadow: 6px 7px 0 rgba(29, 38, 48, 0.15);
+    }
+
+    button.active,
+    button.primary {
+      background: var(--sun);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin: 34px 0 16px;
+    }
+
+    .section-title h2 {
+      margin-bottom: 0;
+      font-size: 2rem;
+      letter-spacing: 0;
+    }
+
+    .section-title p {
+      margin-bottom: 0;
+      color: var(--muted);
+      font-weight: 650;
+      max-width: 44rem;
+    }
+
+    .podium {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      align-items: end;
+    }
+
+    .podium-card {
+      border: 3px solid var(--ink);
+      border-radius: 20px;
+      background: #fff;
+      padding: 18px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      transform: translateY(0);
+      opacity: 1;
+      animation: cardUp 700ms ease forwards;
+    }
+
+    .podium-card:nth-child(1) {
+      min-height: 290px;
+      animation-delay: 60ms;
+    }
+
+    .podium-card:nth-child(2) {
+      min-height: 250px;
+      animation-delay: 180ms;
+    }
+
+    .podium-card:nth-child(3) {
+      min-height: 230px;
+      animation-delay: 300ms;
+    }
+
+    .podium-card::before {
+      content: "";
+      position: absolute;
+      width: 190px;
+      height: 190px;
+      right: -55px;
+      top: -70px;
+      border-radius: 50%;
+      background: var(--card-color);
+      opacity: 0.25;
+    }
+
+    .medal {
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      border: 3px solid var(--ink);
+      background: var(--sun);
+      font-weight: 950;
+      font-size: 1.3rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .flavour-photo-wrap {
+      position: relative;
+      z-index: 1;
+      margin: 14px 0 16px;
+      border: 2px solid var(--ink);
+      border-radius: 16px;
+      overflow: hidden;
+      background: #fff8ed;
+      box-shadow: inset 0 -10px 0 rgba(0, 0, 0, 0.05);
+    }
+
+    .flavour-photo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(1.08) contrast(1.02);
+      transform: scale(1.01);
+      transition: transform 260ms ease;
+    }
+
+    .podium-card:hover .flavour-photo,
+    .flavour-card:hover .flavour-photo,
+    .spotlight:hover .flavour-photo {
+      transform: scale(1.06);
+    }
+
+    .podium-photo-wrap {
+      height: 142px;
+    }
+
+    .spotlight-photo-wrap {
+      height: 190px;
+      margin-top: 4px;
+    }
+
+    .card-photo-wrap {
+      height: 118px;
+      margin: 12px 0 10px;
+    }
+
+    .podium-card h3 {
+      font-size: 1.55rem;
+      margin-bottom: 6px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .podium-card p {
+      color: var(--muted);
+      font-weight: 680;
+      margin-bottom: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    .race-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 340px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .chart {
+      border: 3px solid var(--ink);
+      border-radius: 22px;
+      background: rgba(255, 255, 255, 0.88);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .bar-row {
+      display: grid;
+      grid-template-columns: 52px 54px minmax(120px, 1fr) minmax(180px, 2fr) 74px;
+      gap: 12px;
+      align-items: center;
+      min-height: 54px;
+      padding: 8px 14px;
+      border-bottom: 1px solid var(--line);
+      transition: background 160ms ease, transform 180ms ease;
+      cursor: pointer;
+    }
+
+    .bar-row:hover,
+    .bar-row.selected {
+      background: #fff5cf;
+    }
+
+    .bar-row:last-child {
+      border-bottom: 0;
+    }
+
+    .bar-rank {
+      font-weight: 950;
+      color: var(--muted);
+    }
+
+    .bar-thumb {
+      width: 48px;
+      height: 48px;
+      border: 2px solid var(--ink);
+      border-radius: 12px;
+      object-fit: cover;
+      background: #fff8ed;
+      box-shadow: 2px 3px 0 rgba(29, 38, 48, 0.14);
+    }
+
+    .bar-label {
+      font-weight: 880;
+      min-width: 0;
+    }
+
+    .bar-track {
+      height: 24px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--card-color) 0 var(--score-width, 0%), #f4efe5 var(--score-width, 0%) 100%);
+      overflow: hidden;
+      box-shadow: inset 0 2px 0 rgba(0, 0, 0, 0.07);
+    }
+
+    .bar-fill {
+      height: 100%;
+      width: 0;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.06), rgba(255, 241, 118, 0.62));
+      transition: width 1100ms cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .bar-fill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, transparent 0 42%, rgba(255,255,255,0.72) 48%, transparent 56% 100%);
+      transform: translateX(-120%);
+      animation: shine 2.4s ease-in-out infinite;
+    }
+
+    .bar-score {
+      font-weight: 950;
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .spotlight {
+      position: sticky;
+      top: 18px;
+      border: 3px solid var(--ink);
+      border-radius: 22px;
+      background: #fff;
+      box-shadow: var(--shadow);
+      padding: 18px;
+      overflow: hidden;
+    }
+
+    .spotlight::before {
+      content: "";
+      position: absolute;
+      inset: -80px -80px auto auto;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: var(--spot-color, var(--sun));
+      opacity: 0.24;
+    }
+
+    .spotlight h3 {
+      font-size: 2rem;
+      margin-bottom: 8px;
+      position: relative;
+    }
+
+    .spotlight-score {
+      font-size: 3rem;
+      font-weight: 950;
+      line-height: 1;
+      color: var(--spot-color, var(--good));
+      position: relative;
+    }
+
+    .spotlight p {
+      color: var(--muted);
+      font-weight: 680;
+      position: relative;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .flavour-card {
+      border: 2px solid var(--ink);
+      border-radius: 18px;
+      background: #fff;
+      padding: 14px;
+      min-height: 228px;
+      box-shadow: 5px 6px 0 rgba(29, 38, 48, 0.12);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .flavour-card:hover {
+      transform: translateY(-5px) rotate(-0.4deg);
+      box-shadow: 8px 12px 0 rgba(29, 38, 48, 0.15);
+    }
+
+    .flavour-card::before {
+      content: "";
+      position: absolute;
+      width: 140px;
+      height: 140px;
+      right: -45px;
+      top: -50px;
+      border-radius: 50%;
+      background: var(--card-color);
+      opacity: 0.2;
+    }
+
+    .card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      position: relative;
+    }
+
+    .mini-rank {
+      width: 38px;
+      height: 38px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: var(--cream);
+      font-weight: 950;
+    }
+
+    .tag {
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 0.76rem;
+      font-weight: 900;
+      color: white;
+    }
+
+    .tag.keep {
+      background: var(--good);
+    }
+
+    .tag.test {
+      background: var(--test);
+    }
+
+    .tag.cut {
+      background: var(--cut);
+    }
+
+    .flavour-card h3 {
+      position: relative;
+      margin-bottom: 4px;
+      font-size: 1.08rem;
+    }
+
+    .flavour-card p {
+      position: relative;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 0;
+    }
+
+    .score-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 8px;
+      border: 2px solid var(--ink);
+      border-radius: 999px;
+      padding: 5px 9px;
+      background: #fffaf0;
+      font-weight: 950;
+    }
+
+    .notes {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .note {
+      border: 2px solid var(--ink);
+      border-radius: 18px;
+      background: #fff;
+      padding: 18px;
+      box-shadow: 5px 6px 0 rgba(29, 38, 48, 0.12);
+    }
+
+    .note h3 {
+      margin-bottom: 8px;
+    }
+
+    .note p {
+      color: var(--muted);
+      font-weight: 680;
+      margin-bottom: 0;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .confetti {
+      position: fixed;
+      width: 10px;
+      height: 16px;
+      top: -30px;
+      z-index: 10;
+      pointer-events: none;
+      border-radius: 3px;
+      animation: confettiFall 1400ms ease-in forwards;
+    }
+
+    @keyframes cardUp {
+      from {
+        transform: translateY(14px) scale(0.98);
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes collageFloat {
+      0%, 100% {
+        transform: translateY(0) rotate(-0.4deg);
+      }
+      50% {
+        transform: translateY(-7px) rotate(0.5deg);
+      }
+    }
+
+    @keyframes shine {
+      0% {
+        transform: translateX(-120%);
+      }
+      55%, 100% {
+        transform: translateX(120%);
+      }
+    }
+
+    @keyframes confettiFall {
+      to {
+        transform: translateY(105vh) rotate(540deg);
+        opacity: 0;
+      }
+    }
+
+    @media (max-width: 980px) {
+      .hero,
+      .race-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-art {
+        min-height: 360px;
+      }
+
+      .spotlight {
+        position: relative;
+        top: auto;
+      }
+
+      .cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .notes {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 680px) {
+      main {
+        width: min(100% - 18px, 1200px);
+        padding-top: 10px;
+      }
+
+      .hero {
+        border-radius: 16px;
+      }
+
+      .hero-copy {
+        padding: 22px;
+      }
+
+      h1 {
+        font-size: 2.7rem;
+      }
+
+      .hero-copy p {
+        font-size: 1rem;
+      }
+
+      .stats,
+      .podium,
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .bar-row {
+        grid-template-columns: 34px 48px minmax(96px, 1fr) 60px;
+      }
+
+      .bar-track {
+        grid-column: 1 / -1;
+      }
+
+      .section-title {
+        display: block;
+      }
+
+      button,
+      select {
+        width: 100%;
+      }
+    }
+
+    /* ── Dancing mascots ── */
+    #fw-char {
+      position: fixed;
+      bottom: 14vh;
+      left: 50%;
+      pointer-events: none;
+      z-index: 9992;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      filter: drop-shadow(0 0 22px rgba(255,255,255,0.8));
+    }
+    #fw-char.on { opacity: 1; animation: fwDance 0.42s ease-in-out infinite; }
+    @keyframes fwDance {
+      0%   { transform: translateX(-50%) translateY(0)     rotate(0deg)   scale(1);    }
+      18%  { transform: translateX(-50%) translateY(-40px) rotate(-22deg) scale(1.16); }
+      38%  { transform: translateX(-50%) translateY(5px)   rotate(7deg)   scale(0.90); }
+      58%  { transform: translateX(-50%) translateY(-32px) rotate(20deg)  scale(1.13); }
+      80%  { transform: translateX(-50%) translateY(4px)   rotate(-6deg)  scale(0.93); }
+      100% { transform: translateX(-50%) translateY(0)     rotate(0deg)   scale(1);    }
+    }
+
+    /* ── Fireworks overlay ── */
+    #fw-dark {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 4, 18, 0.86);
+      opacity: 0;
+      pointer-events: none;
+      z-index: 9988;
+      transition: opacity 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #fw-dark.on { opacity: 1; }
+
+    #fw-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9990;
+    }
+
+    .podium-card.fw-active {
+      position: relative;
+      z-index: 9989 !important;
+      border-color: var(--card-color) !important;
+      box-shadow:
+        0 0 0 4px var(--card-color),
+        0 0 40px var(--card-color),
+        0 0 100px var(--card-color),
+        0 0 200px var(--card-color) !important;
+      transform: translateY(-12px) scale(1.05) !important;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease !important;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 1ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+
+      body::before,
+      .toolbar,
+      .confetti {
+        display: none;
+      }
+
+      main {
+        width: 100%;
+        padding: 0;
+      }
+
+      .hero,
+      .chart,
+      .spotlight,
+      .flavour-card,
+      .note {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero" aria-label="Flavour testing hero">
+      <div class="hero-copy">
+        <div>
+          <span class="eyebrow">Flavour tasting results</span>
+          <h1>The Great Syrup Showdown</h1>
+          <p>An animated, interactive ranking of 33 tested flavours. Scores use the corrected average of K, C, and A, rounded to one decimal place.</p>
+        </div>
+        <div class="stats" aria-label="Quick stats">
+          <div class="stat">
+            <strong>33</strong>
+            <span>Flavours scored</span>
+          </div>
+          <div class="stat">
+            <strong>9.7</strong>
+            <span>Banana wins</span>
+          </div>
+          <div class="stat">
+            <strong>8</strong>
+            <span>Clear keepers</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-art">
+        <img class="hero-photo-main" src="assets/flavours/banana.jpg" alt="Banana flavour soft serve">
+        <img class="hero-photo-wide" src="assets/flavours/watermelon-slushie.jpg" alt="Watermelon slushie flavour">
+        <img class="hero-photo-tall" src="assets/flavours/creme-de-menthe.jpg" alt="Creme De Menthe flavour cone">
+        <img class="hero-photo-small" src="assets/flavours/peach.jpg" alt="Peach flavour ice cream">
+        <img class="hero-photo-small-two" src="assets/flavours/black-raspberry.jpg" alt="Black raspberry flavour dessert">
+        <div class="score-badge">
+          <strong>Banana</strong>
+          <span>Top flavour with a 9.7/10 average</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="toolbar" aria-label="Interactive controls">
+      <button class="primary" id="replayRace" type="button">Replay graph</button>
+      <button class="filter active" type="button" data-filter="all">All flavours</button>
+      <button class="filter" type="button" data-filter="keep">Keepers</button>
+      <button class="filter" type="button" data-filter="test">Retest</button>
+      <button class="filter" type="button" data-filter="cut">Cuts</button>
+      <select id="sortSelect" aria-label="Sort flavours">
+        <option value="score-desc">Highest score first</option>
+        <option value="score-asc">Lowest score first</option>
+        <option value="name">Alphabetical</option>
+      </select>
+    </div>
+
+    <section>
+      <div class="section-title">
+        <h2>Winner Podium</h2>
+        <p>The top three are the cleanest winners. Click any flavour below to change the spotlight.</p>
+      </div>
+      <div class="podium" id="podium"></div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2>Animated Flavour Race</h2>
+        <p>Bars fill to the corrected average score. The coloured action labels are practical menu recommendations.</p>
+      </div>
+      <div class="race-layout">
+        <div class="chart" id="chart" aria-label="Interactive flavour score chart"></div>
+        <aside class="spotlight" id="spotlight" aria-live="polite"></aside>
+      </div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2>Flavour Cards</h2>
+        <p>Use the controls above to filter or sort the whole tasting set.</p>
+      </div>
+      <div class="cards-grid" id="cards"></div>
+    </section>
+
+    <section>
+      <div class="section-title">
+        <h2>Useful Notes</h2>
+        <p>These are the extra findings from the recovered tasting chat.</p>
+      </div>
+      <div class="notes">
+        <article class="note">
+          <h3>Math correction</h3>
+          <p>The original sheet looked like it truncated some overall scores. This report uses normal one-decimal averages.</p>
+        </article>
+        <article class="note">
+          <h3>Pairing tests</h3>
+          <p>Blueberry with lemon and Creme De Menthe with chocolate syrup are worth a separate small-batch test.</p>
+        </article>
+        <article class="note">
+          <h3>Operational note</h3>
+          <p>The sheet noted 1.5 oz syrup per 16 oz base and a reminder to find the correct pump.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const flavours = [
+      { rank: 1, name: "Banana", score: 9.7, action: "keep", kind: "cone", color: "#ffd65a", note: "Clear winner. Make this easy for customers to notice." },
+      { rank: 2, name: "Peach", score: 9.0, action: "keep", kind: "cone", color: "#ff9a72", note: "Strong fruit option with broad appeal." },
+      { rank: 3, name: "Creme De Menthe", score: 8.8, action: "keep", kind: "cone", color: "#8be4b0", note: "Great candidate for a mint chocolate feature." },
+      { rank: 4, name: "Blueberry", score: 8.7, action: "keep", kind: "cone", color: "#6b7df4", note: "High score. Also test the blueberry plus lemon idea." },
+      { rank: 5, name: "Black Raspberry", score: 8.7, action: "keep", kind: "cone", color: "#a13bd3", note: "Strong berry flavour. Keep in the main shortlist." },
+      { rank: 6, name: "Watermelon Slushie", score: 8.7, action: "keep", kind: "slush", color: "#ff4f69", note: "Best slushie performer and a strong summer flavour." },
+      { rank: 7, name: "Cotton Candy", score: 8.3, action: "keep", kind: "cone", color: "#ff9ddb", note: "Fun, colourful, and likely kid-friendly." },
+      { rank: 8, name: "Sour Cherry Mix 20/80", score: 8.2, action: "keep", kind: "slush", color: "#d91f4f", note: "Missing in the original overall cell; corrected to 8.2." },
+      { rank: 9, name: "Espresso", score: 8.0, action: "keep", kind: "affogato", color: "#8a4f30", note: "Strong adult-leaning option." },
+      { rank: 10, name: "Black Cherry", score: 7.8, action: "test", kind: "cone", color: "#b3163a", note: "Good score. Worth customer testing." },
+      { rank: 11, name: "Blackberry", score: 7.5, action: "test", kind: "cone", color: "#533092", note: "Solid berry option." },
+      { rank: 12, name: "Strawberry", score: 7.3, action: "test", kind: "cone", color: "#f05373", note: "Familiar flavour with decent support." },
+      { rank: 13, name: "Tutti Frutti", score: 7.0, action: "test", kind: "cone", color: "#ff7cb2", note: "Middle-high novelty flavour." },
+      { rank: 14, name: "Amarillo", score: 6.7, action: "test", kind: "cone", color: "#ffa83f", note: "Borderline. Retest if it has a clear use." },
+      { rank: 15, name: "Blue Raspberry", score: 6.7, action: "test", kind: "slush", color: "#1b9be8", note: "Retest, especially if brand quality is uncertain." },
+      { rank: 16, name: "Rum", score: 6.5, action: "test", kind: "cone", color: "#b46d32", note: "Niche option. Needs a reason to keep." },
+      { rank: 17, name: "Maple Nut", score: 6.5, action: "test", kind: "cone", color: "#c98b3b", note: "Could be seasonal, but not a clear winner." },
+      { rank: 18, name: "Cherry Slushie", score: 6.3, action: "test", kind: "slush", color: "#e2334f", note: "Retest against the stronger sour cherry mix." },
+      { rank: 19, name: "Sour Candy Watermelon Mix", score: 6.3, action: "test", kind: "slush", color: "#ff5f8c", note: "Fun concept but not top tier." },
+      { rank: 20, name: "Pina Colada", score: 6.2, action: "test", kind: "cone", color: "#f7d76d", note: "Tropical but mid-pack." },
+      { rank: 21, name: "Sour Candy Slushie", score: 6.2, action: "test", kind: "slush", color: "#2dc7b5", note: "Middle performer. Needs a sharper customer reason." },
+      { rank: 22, name: "Chocolate", score: 6.0, action: "test", kind: "affogato", color: "#70462f", note: "Surprisingly mid. Compare against chocolate syrup combinations." },
+      { rank: 23, name: "Blue Raspberry Slushie", score: 5.8, action: "test", kind: "slush", color: "#2b7ce9", note: "Try another brand before cutting the idea." },
+      { rank: 24, name: "Lemon", score: 5.2, action: "cut", kind: "cone", color: "#f4e55c", note: "Weak alone, but may still help as a pairing ingredient." },
+      { rank: 25, name: "German Chocolate", score: 5.0, action: "cut", kind: "affogato", color: "#7a4a32", note: "Not strong enough for menu space." },
+      { rank: 26, name: "Orange", score: 4.3, action: "cut", kind: "cone", color: "#ff8a34", note: "Low score. Cut unless customer demand says otherwise." },
+      { rank: 27, name: "Cheesecake", score: 4.3, action: "cut", kind: "cone", color: "#f0dfb0", note: "Low score for a dessert flavour." },
+      { rank: 28, name: "Root Beer", score: 4.2, action: "cut", kind: "slush", color: "#805035", note: "Weak result. Not a priority." },
+      { rank: 29, name: "Pistachio", score: 4.0, action: "cut", kind: "cone", color: "#9ccf7a", note: "Too low to keep without a special reason." },
+      { rank: 30, name: "Caramel", score: 3.0, action: "cut", kind: "affogato", color: "#bd7833", note: "Very weak in this tasting." },
+      { rank: 31, name: "Butter Pecan", score: 2.7, action: "cut", kind: "cone", color: "#d6a454", note: "Very weak result." },
+      { rank: 32, name: "Hazelnut", score: 2.3, action: "cut", kind: "affogato", color: "#9b693d", note: "Tied lowest. Cut first." },
+      { rank: 33, name: "Apricot", score: 2.3, action: "cut", kind: "cone", color: "#ffb15d", note: "Tied lowest. The peanut butter experiment is not enough to save it." }
+    ];
+
+    const actionText = {
+      keep: "Keep",
+      test: "Retest",
+      cut: "Cut"
+    };
+
+    const chart = document.getElementById("chart");
+    const cards = document.getElementById("cards");
+    const podium = document.getElementById("podium");
+    const spotlight = document.getElementById("spotlight");
+    const sortSelect = document.getElementById("sortSelect");
+    const replayRace = document.getElementById("replayRace");
+    const filterButtons = [...document.querySelectorAll(".filter")];
+    let activeFilter = "all";
+    let selectedName = "Banana";
+
+    function slugify(name) {
+      return name
+        .toLowerCase()
+        .replace(/&/g, "and")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+    }
+
+    function photoSrc(flavour) {
+      return `assets/flavours/${slugify(flavour.name)}.jpg`;
+    }
+
+    function photo(flavour, variant = "card") {
+      const wrapClass = {
+        podium: "podium-photo-wrap",
+        spotlight: "spotlight-photo-wrap",
+        card: "card-photo-wrap"
+      }[variant] || "card-photo-wrap";
+
+      return `
+        <figure class="flavour-photo-wrap ${wrapClass}">
+          <img class="flavour-photo" src="${photoSrc(flavour)}" alt="${flavour.name} flavour photo" loading="${variant === "spotlight" ? "eager" : "lazy"}">
+        </figure>
+      `;
+    }
+
+    function sortedData() {
+      const mode = sortSelect.value;
+      const filtered = activeFilter === "all"
+        ? [...flavours]
+        : flavours.filter(flavour => flavour.action === activeFilter);
+
+      if (mode === "score-asc") {
+        return filtered.sort((a, b) => a.score - b.score || a.rank - b.rank);
+      }
+
+      if (mode === "name") {
+        return filtered.sort((a, b) => a.name.localeCompare(b.name));
+      }
+
+      return filtered.sort((a, b) => b.score - a.score || a.rank - b.rank);
+    }
+
+    function renderPodium() {
+      podium.innerHTML = flavours.slice(0, 3).map((flavour, index) => `
+        <article class="podium-card" style="--card-color: ${flavour.color}" data-name="${flavour.name}">
+          <div class="medal">${index + 1}</div>
+          ${photo(flavour, "podium")}
+          <h3>${flavour.name}</h3>
+          <p>${flavour.score.toFixed(1)}/10 average. ${flavour.note}</p>
+        </article>
+      `).join("");
+
+      podium.querySelectorAll(".podium-card").forEach(card => {
+        card.addEventListener("click", () => selectFlavour(card.dataset.name, true));
+        const f = flavours.find(fl => fl.name === card.dataset.name);
+        if (f) {
+          let fwTimer = null;
+          card.addEventListener("mouseenter", () => {
+            card.classList.add("fw-active");
+            FW.startFor(f.color);
+            showChar(f.name);
+            fwTimer = setTimeout(() => {
+              FW.stop();
+              hideChar();
+              card.classList.remove("fw-active");
+            }, 3000);
+          });
+          card.addEventListener("mouseleave", () => {
+            clearTimeout(fwTimer);
+            card.classList.remove("fw-active");
+            FW.stop();
+            hideChar();
+          });
+        }
+      });
+    }
+
+    function renderChart() {
+      const data = sortedData();
+      chart.innerHTML = data.map((flavour, index) => `
+        <div class="bar-row ${flavour.name === selectedName ? "selected" : ""}" data-name="${flavour.name}" style="--card-color: ${flavour.color}; --score-width: ${flavour.score * 10}%">
+          <div class="bar-rank">${index + 1}</div>
+          <img class="bar-thumb" src="${photoSrc(flavour)}" alt="" loading="lazy">
+          <div class="bar-label">${flavour.name}</div>
+          <div class="bar-track" aria-hidden="true">
+            <div class="bar-fill" data-width="${flavour.score * 10}"></div>
+          </div>
+          <div class="bar-score">${flavour.score.toFixed(1)}</div>
+        </div>
+      `).join("");
+
+      chart.querySelectorAll(".bar-row").forEach(row => {
+        row.addEventListener("click", () => selectFlavour(row.dataset.name, true));
+      });
+
+      requestAnimationFrame(() => {
+        chart.querySelectorAll(".bar-fill").forEach(fill => {
+          fill.style.width = fill.dataset.width + "%";
+        });
+      });
+    }
+
+    function renderCards() {
+      const data = sortedData();
+      cards.innerHTML = data.map(flavour => `
+        <article class="flavour-card" data-name="${flavour.name}" style="--card-color: ${flavour.color}">
+          <div class="card-top">
+            <div class="mini-rank">${flavour.rank}</div>
+            <div class="tag ${flavour.action}">${actionText[flavour.action]}</div>
+          </div>
+          ${photo(flavour, "card")}
+          <h3>${flavour.name}</h3>
+          <p>${flavour.note}</p>
+          <div class="score-chip">${flavour.score.toFixed(1)}/10</div>
+        </article>
+      `).join("");
+
+      cards.querySelectorAll(".flavour-card").forEach(card => {
+        card.addEventListener("click", () => selectFlavour(card.dataset.name, true));
+      });
+    }
+
+    function renderSpotlight(flavour) {
+      spotlight.style.setProperty("--spot-color", flavour.color);
+      spotlight.innerHTML = `
+        ${photo(flavour, "spotlight")}
+        <h3>${flavour.name}</h3>
+        <div class="spotlight-score">${flavour.score.toFixed(1)}</div>
+        <p><strong>${actionText[flavour.action]}.</strong> ${flavour.note}</p>
+      `;
+    }
+
+    function selectFlavour(name, celebrate = false) {
+      const flavour = flavours.find(item => item.name === name) || flavours[0];
+      selectedName = flavour.name;
+      renderSpotlight(flavour);
+      chart.querySelectorAll(".bar-row").forEach(row => {
+        row.classList.toggle("selected", row.dataset.name === selectedName);
+      });
+      if (celebrate && flavour.action === "keep") {
+        confetti(18, flavour.color);
+      }
+    }
+
+    function renderAll() {
+      renderChart();
+      renderCards();
+      selectFlavour(selectedName, false);
+    }
+
+    function confetti(count, preferredColor) {
+      const colors = [preferredColor, "#ffcc3d", "#ff9368", "#7e3ff2", "#36b37e", "#2876d7", "#e23d5a"];
+      for (let i = 0; i < count; i += 1) {
+        const piece = document.createElement("span");
+        piece.className = "confetti";
+        piece.style.left = Math.random() * 100 + "vw";
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.animationDelay = Math.random() * 240 + "ms";
+        piece.style.transform = `rotate(${Math.random() * 180}deg)`;
+        document.body.appendChild(piece);
+        window.setTimeout(() => piece.remove(), 1800);
+      }
+    }
+
+    filterButtons.forEach(button => {
+      button.addEventListener("click", () => {
+        activeFilter = button.dataset.filter;
+        filterButtons.forEach(item => item.classList.toggle("active", item === button));
+        const currentSet = sortedData();
+        if (!currentSet.some(item => item.name === selectedName)) {
+          selectedName = currentSet[0] ? currentSet[0].name : "Banana";
+        }
+        renderAll();
+      });
+    });
+
+    sortSelect.addEventListener("change", renderAll);
+
+    replayRace.addEventListener("click", () => {
+      renderChart();
+      selectFlavour(selectedName, false);
+      confetti(28, "#ffcc3d");
+    });
+
+    // ── Dramatic Fireworks System ──────────────────────────────────────────
+    const FW = (() => {
+      let cvs, ctx, dark;
+      let rockets = [], particles = [];
+      let raf = null, timer = null, alive = false;
+
+      function hex(h) {
+        return [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+      }
+      function pale(rgb, t) { return rgb.map(c => Math.round(c + (255 - c) * t)); }
+      function rnd(lo, hi) { return lo + Math.random() * (hi - lo); }
+
+      function boot() {
+        dark = document.createElement("div");
+        dark.id = "fw-dark";
+        document.body.appendChild(dark);
+
+        cvs = document.createElement("canvas");
+        cvs.id = "fw-canvas";
+        document.body.appendChild(cvs);
+        ctx = cvs.getContext("2d");
+
+        const fit = () => { cvs.width = innerWidth; cvs.height = innerHeight; };
+        fit();
+        window.addEventListener("resize", fit);
+      }
+
+      function startFor(hexColor) {
+        const rgb = hex(hexColor);
+        alive = true;
+        dark.classList.add("on");
+
+        for (let i = 0; i < 7; i++) setTimeout(() => shoot(rgb), i * 65);
+
+        clearInterval(timer);
+        timer = setInterval(() => {
+          if (!alive) return;
+          shoot(rgb);
+          if (Math.random() > 0.3) shoot(rgb);
+          if (Math.random() > 0.65) shoot(rgb);
+        }, 300);
+
+        if (!raf) frame();
+      }
+
+      function stop() {
+        alive = false;
+        clearInterval(timer);
+        dark.classList.remove("on");
+      }
+
+      function shoot(rgb) {
+        const W = cvs.width, H = cvs.height;
+        rockets.push({
+          x: rnd(W * 0.06, W * 0.94),
+          y: H + 10,
+          vx: rnd(-3.5, 3.5),
+          vy: -rnd(17, 26),
+          rgb,
+          trail: [],
+          done: false,
+          peakY: rnd(H * 0.04, H * 0.48)
+        });
+      }
+
+      function boom(r) {
+        const { x, y, rgb } = r;
+        const N = 190 + Math.floor(Math.random() * 100);
+        const px = (x / cvs.width * 100).toFixed(1);
+        const py = (y / cvs.height * 100).toFixed(1);
+
+        // Radial colour flash on the dark overlay
+        dark.style.background = `radial-gradient(ellipse 60% 50% at ${px}% ${py}%, rgba(${rgb[0]},${rgb[1]},${rgb[2]},0.65) 0%, rgba(4,4,18,0.9) 60%)`;
+        setTimeout(() => { dark.style.background = "rgba(4,4,18,0.86)"; }, 200);
+
+        // Main burst
+        for (let i = 0; i < N; i++) {
+          const a = (i / N) * Math.PI * 2 + rnd(-0.06, 0.06);
+          const spd = rnd(1.5, 12);
+          const isGold = Math.random() > 0.55;
+          const c = isGold ? pale(rgb, 0.55) : (Math.random() > 0.4 ? rgb : pale(rgb, 0.25));
+          push(x, y, Math.cos(a)*spd, Math.sin(a)*spd, c, rnd(0.88,1.0), rnd(0.01,0.022), rnd(1.5,4.5), rnd(0.055,0.14), rnd(0.965,0.992), Math.random() > 0.45);
+        }
+
+        // Wide fast outer ring (white sparks)
+        for (let i = 0; i < 55; i++) {
+          const a = Math.random() * Math.PI * 2;
+          push(x, y, Math.cos(a)*rnd(11,20), Math.sin(a)*rnd(11,20), [255,255,220], 0.55, 0.028, 1.3, 0.04, 0.925, true);
+        }
+
+        // Droopy gravity streamers (long life, heavy fall)
+        for (let i = 0; i < 32; i++) {
+          const a = rnd(0, Math.PI * 2);
+          const c = pale(rgb, 0.3);
+          push(x, y, Math.cos(a)*rnd(2,7), Math.sin(a)*rnd(2,6) - 3, c, 1.0, 0.005, 2.8, 0.38, 0.989, false);
+        }
+
+        // Tight glitter core
+        for (let i = 0; i < 30; i++) {
+          const a = Math.random() * Math.PI * 2;
+          push(x, y, Math.cos(a)*rnd(0.5,3.5), Math.sin(a)*rnd(0.5,3.5), [255,255,240], 1.0, 0.014, 1.8, 0.02, 0.98, true);
+        }
+      }
+
+      function push(x, y, vx, vy, c, life, decay, size, grav, drag, twinkle) {
+        particles.push({ x, y, vx, vy, r: c[0], g: c[1], b: c[2], life, decay, size, grav, drag, twinkle });
+      }
+
+      function frame() {
+        const W = cvs.width, H = cvs.height;
+        ctx.clearRect(0, 0, W, H);
+
+        // Rockets
+        for (let i = rockets.length - 1; i >= 0; i--) {
+          const r = rockets[i];
+          r.trail.push({ x: r.x, y: r.y });
+          if (r.trail.length > 24) r.trail.shift();
+          r.vy += 0.3;
+          r.x += r.vx;
+          r.y += r.vy;
+
+          for (let j = 0; j < r.trail.length; j++) {
+            const f = j / r.trail.length;
+            ctx.globalAlpha = f * 0.92;
+            ctx.fillStyle = `rgb(${r.rgb[0]},${r.rgb[1]},${r.rgb[2]})`;
+            ctx.beginPath();
+            ctx.arc(r.trail[j].x, r.trail[j].y, f * 3.5, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          ctx.globalAlpha = 1;
+          ctx.shadowBlur = 28;
+          ctx.shadowColor = `rgb(${r.rgb[0]},${r.rgb[1]},${r.rgb[2]})`;
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(r.x, r.y, 5, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.shadowBlur = 0;
+
+          if (r.vy >= -0.5 || r.y <= r.peakY) {
+            if (!r.done) { r.done = true; boom(r); }
+            rockets.splice(i, 1);
+          }
+        }
+
+        // Particles
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.vx *= p.drag;
+          p.vy = p.vy * p.drag + p.grav;
+          p.x += p.vx;
+          p.y += p.vy;
+          p.life -= p.decay;
+          if (p.life <= 0) { particles.splice(i, 1); continue; }
+
+          const alpha = p.twinkle ? Math.abs(Math.sin(p.life * 38)) * p.life : p.life;
+          ctx.globalAlpha = Math.max(0, alpha);
+          ctx.shadowBlur = 6;
+          ctx.shadowColor = `rgb(${p.r},${p.g},${p.b})`;
+          ctx.fillStyle = `rgb(${p.r},${p.g},${p.b})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, Math.max(0.3, p.size * p.life), 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        ctx.globalAlpha = 1;
+        ctx.shadowBlur = 0;
+
+        if (alive || rockets.length || particles.length) {
+          raf = requestAnimationFrame(frame);
+        } else {
+          ctx.clearRect(0, 0, W, H);
+          raf = null;
+        }
+      }
+
+      return { boot, startFor, stop };
+    })();
+
+    FW.boot();
+
+    const CHARS = {
+      "Banana": '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="130" viewBox="0 0 90 120"><path d="M38,110C14,95 8,55 22,24C32,4 58,2 70,24C82,46 70,90 38,110Z" fill="#ffd65a" stroke="#c9a000" stroke-width="2"/><rect x="30" y="8" width="24" height="14" rx="3" fill="#c9a000"/><rect x="24" y="19" width="36" height="6" rx="3" fill="#c9a000"/><circle cx="38" cy="50" r="3.5" fill="#222"/><circle cx="54" cy="46" r="3.5" fill="#222"/><path d="M35,62 Q44,74 56,61" stroke="#222" stroke-width="2.5" fill="none" stroke-linecap="round"/><g><animateTransform attributeName="transform" type="rotate" values="0 22 70;-40 22 70;0 22 70" dur="0.42s" repeatCount="indefinite"/><line x1="22" y1="70" x2="4" y2="46" stroke="#c9a000" stroke-width="4" stroke-linecap="round"/><circle cx="3" cy="44" r="5" fill="#ffd65a" stroke="#c9a000" stroke-width="1.5"/></g><g><animateTransform attributeName="transform" type="rotate" values="0 60 62;40 60 62;0 60 62" dur="0.42s" begin="0.21s" repeatCount="indefinite"/><line x1="60" y1="62" x2="78" y2="40" stroke="#c9a000" stroke-width="4" stroke-linecap="round"/><circle cx="79" cy="38" r="5" fill="#ffd65a" stroke="#c9a000" stroke-width="1.5"/></g><line x1="34" y1="108" x2="22" y2="118" stroke="#c9a000" stroke-width="4" stroke-linecap="round"/><line x1="52" y1="106" x2="64" y2="118" stroke="#c9a000" stroke-width="4" stroke-linecap="round"/></svg>',
+      "Peach": '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="120" viewBox="0 0 90 110"><circle cx="45" cy="65" r="40" fill="#ff9a72" stroke="#d9713e" stroke-width="2"/><path d="M45,28 Q38,50 45,90" stroke="#d9713e" stroke-width="1.5" fill="none"/><path d="M45,28C40,14 28,10 32,20C38,18 44,25 45,28Z" fill="#52a851"/><path d="M45,28C50,13 62,10 58,20C52,18 46,25 45,28Z" fill="#52a851"/><circle cx="34" cy="60" r="3.5" fill="#3a1000"/><circle cx="56" cy="60" r="3.5" fill="#3a1000"/><path d="M32,75 Q45,89 58,75" stroke="#3a1000" stroke-width="2.5" fill="none" stroke-linecap="round"/><g><animateTransform attributeName="transform" type="rotate" values="0 19 46;-40 19 46;0 19 46" dur="0.42s" repeatCount="indefinite"/><line x1="6" y1="62" x2="19" y2="46" stroke="#d9713e" stroke-width="5" stroke-linecap="round"/><circle cx="5" cy="63" r="6" fill="#ff9a72" stroke="#d9713e" stroke-width="1.5"/></g><g><animateTransform attributeName="transform" type="rotate" values="0 71 46;40 71 46;0 71 46" dur="0.42s" begin="0.21s" repeatCount="indefinite"/><line x1="84" y1="62" x2="71" y2="46" stroke="#d9713e" stroke-width="5" stroke-linecap="round"/><circle cx="85" cy="63" r="6" fill="#ff9a72" stroke="#d9713e" stroke-width="1.5"/></g></svg>',
+      "Creme De Menthe": '<svg xmlns="http://www.w3.org/2000/svg" width="100" height="120" viewBox="0 0 90 110"><ellipse cx="45" cy="60" rx="38" ry="48" fill="#8be4b0" stroke="#3fb07a" stroke-width="2"/><line x1="45" y1="14" x2="45" y2="104" stroke="#3fb07a" stroke-width="1.5" opacity="0.5"/><line x1="45" y1="40" x2="22" y2="64" stroke="#3fb07a" stroke-width="1" opacity="0.5"/><line x1="45" y1="40" x2="68" y2="64" stroke="#3fb07a" stroke-width="1" opacity="0.5"/><line x1="45" y1="64" x2="20" y2="82" stroke="#3fb07a" stroke-width="1" opacity="0.5"/><line x1="45" y1="64" x2="70" y2="82" stroke="#3fb07a" stroke-width="1" opacity="0.5"/><circle cx="34" cy="54" r="3.5" fill="#0a2e18"/><circle cx="56" cy="54" r="3.5" fill="#0a2e18"/><path d="M32,69 Q45,83 58,69" stroke="#0a2e18" stroke-width="2.5" fill="none" stroke-linecap="round"/><g><animateTransform attributeName="transform" type="rotate" values="0 21 40;-40 21 40;0 21 40" dur="0.42s" repeatCount="indefinite"/><line x1="8" y1="58" x2="21" y2="40" stroke="#3fb07a" stroke-width="5" stroke-linecap="round"/><circle cx="7" cy="59" r="6" fill="#8be4b0" stroke="#3fb07a" stroke-width="1.5"/></g><g><animateTransform attributeName="transform" type="rotate" values="0 69 40;40 69 40;0 69 40" dur="0.42s" begin="0.21s" repeatCount="indefinite"/><line x1="82" y1="58" x2="69" y2="40" stroke="#3fb07a" stroke-width="5" stroke-linecap="round"/><circle cx="83" cy="59" r="6" fill="#8be4b0" stroke="#3fb07a" stroke-width="1.5"/></g></svg>'
+    };
+    const charEl = document.createElement("div");
+    charEl.id = "fw-char";
+    document.body.appendChild(charEl);
+    const svgParser = new DOMParser();
+    function showChar(name) {
+      const markup = CHARS[name];
+      if (!markup) return;
+      const parsed = svgParser.parseFromString(markup, "image/svg+xml");
+      charEl.replaceChildren(parsed.documentElement.cloneNode(true));
+      charEl.classList.add("on");
+    }
+    function hideChar() { charEl.classList.remove("on"); }
+
+    renderPodium();
+    renderAll();
+  </script>
+</body>
+</html>
